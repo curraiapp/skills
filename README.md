@@ -40,7 +40,7 @@ npx @currai/skills list
 
 | Skill    | Description                                                                         |
 | -------- | ----------------------------------------------------------------------------------- |
-| `currai` | Adding observability to an AI app with `@currai/sdk` — traces, generations, spans, MCP tool wrapping, AI SDK integration, flush hygiene. |
+| `currai` | Adding observability to an AI app with `currai` — traces, generations, spans, MCP tool wrapping, AI SDK integration, flush hygiene. |
 
 ## How is this different from docs?
 

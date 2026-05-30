@@ -1,18 +1,18 @@
 ---
 name: currai
-description: Use when adding observability to an AI app with Currai — instrumenting LLM calls, MCP tools, and agent runs with traces, generations, and spans via @currai/sdk. Covers client setup, the trace/generation/span hierarchy, MCP tool wrapping, Vercel AI SDK integration, and flush hygiene for serverless.
+description: Use when adding observability to an AI app with Currai — instrumenting LLM calls, MCP tools, and agent runs with traces, generations, and spans via currai. Covers client setup, the trace/generation/span hierarchy, MCP tool wrapping, Vercel AI SDK integration, and flush hygiene for serverless.
 allowed-tools:
   - WebFetch(domain:currai.com)
-  - Bash(pnpm add @currai/sdk*)
-  - Bash(pnpm add -D @currai/sdk*)
-  - Bash(npm install @currai/sdk*)
-  - Bash(npm install --save-dev @currai/sdk*)
-  - Bash(yarn add @currai/sdk*)
+  - Bash(pnpm add currai*)
+  - Bash(pnpm add -D currai*)
+  - Bash(npm install currai*)
+  - Bash(npm install --save-dev currai*)
+  - Bash(yarn add currai*)
 ---
 
 # Currai — AI observability skill
 
-This skill teaches you how to instrument an AI application with **Currai**, an open-source LLM observability platform. Use it whenever a user asks to "add tracing", "log my LLM calls", "see token usage", "debug an agent", or wire up `@currai/sdk`.
+This skill teaches you how to instrument an AI application with **Currai**, an open-source LLM observability platform. Use it whenever a user asks to "add tracing", "log my LLM calls", "see token usage", "debug an agent", or wire up `currai`.
 
 ## 1. What Currai is
 
@@ -27,7 +27,7 @@ The mental model mirrors OpenTelemetry: one trace per logical request, observati
 ## 2. Install & environment
 
 ```bash
-pnpm add @currai/sdk
+pnpm add currai
 ```
 
 Required environment variables:
@@ -45,7 +45,7 @@ Create keys from the Currai dashboard: **Workspace → Settings → API Keys**. 
 Instantiate `Currai` exactly once per process and reuse it. In Next.js / serverless, stash the client on `globalThis` so HMR and route handlers don't create duplicates:
 
 ```ts
-import { Currai } from "@currai/sdk";
+import { Currai } from "currai";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -144,7 +144,7 @@ const span = trace.span({
 When you connect to an MCP server via the Vercel AI SDK, wrap every tool's `execute` so each invocation creates a child span automatically:
 
 ```ts
-import type { CurraiSpan } from "@currai/sdk";
+import type { CurraiSpan } from "currai";
 
 export type SpanFactory = (name: string, input: unknown) => CurraiSpan;
 
@@ -300,7 +300,7 @@ If you forget this, the UI will show traces with missing observations — usuall
 
 ## 8. Reference: SDK exports
 
-The `@currai/sdk` entry point exports:
+The `currai` entry point exports:
 
 - `Currai` — the client (`new Currai(options)`)
 - `CurraiTrace`, `CurraiGeneration`, `CurraiSpan`, `CurraiEvent` — observation classes returned by `trace.*()` calls
