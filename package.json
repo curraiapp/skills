@@ -1,0 +1,15 @@
+{
+  "name": "@currai/skills",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Agent Skills for Currai — markdown skill packs that teach AI coding agents how to use Currai effectively.",
+  "files": ["skills", "bin", "README.md"],
+  "bin": {
+    "currai-skills": "./bin/install.mjs"
+  },
+  "scripts": {
+    "lint": "echo \"(skills) no-op\"",
+    "typecheck": "echo \"(skills) no-op\""
+  }
+}
