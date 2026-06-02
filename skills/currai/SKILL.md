@@ -35,7 +35,8 @@ Required environment variables:
 ```bash
 CURRAI_PUBLIC_KEY=pk-lf-...
 CURRAI_SECRET_KEY=sk-lf-...
-CURRAI_BASE_URL=http://localhost:3000   # or your hosted Currai URL
+# CURRAI_BASE_URL is optional — defaults to the hosted Currai instance.
+# Only set it if you self-host.
 ```
 
 Create keys from the Currai dashboard: **Workspace → Settings → API Keys**. The public key is sent in plaintext; the secret is hashed server-side and only shown once on creation.
@@ -64,7 +65,8 @@ export function getCurrai(): Currai {
     globalThis.__currai = new Currai({
       publicKey,
       secretKey,
-      baseUrl: process.env.CURRAI_BASE_URL ?? "http://localhost:3000",
+      // baseUrl defaults to the hosted Currai instance — only pass it to self-host:
+      // baseUrl: process.env.CURRAI_BASE_URL,
       // Production defaults: batch up to 15 events or flush every 10s.
       // For demos / local debugging where you want events to appear immediately:
       // flushAt: 1,
