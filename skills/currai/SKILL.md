@@ -12,7 +12,7 @@ allowed-tools:
 
 # Currai — AI observability skill
 
-This skill teaches you how to instrument an AI application with **Currai**, an open-source LLM observability platform. Use it whenever a user asks to "add tracing", "log my LLM calls", "see token usage", "debug an agent", or wire up `currai`.
+This skill teaches you how to instrument an AI application with **Currai**, an open-source LLM observability platform. Use it whenever a user asks to "add tracing", "log my LLM calls", "see token usage", "debug an agent", manage prompts, run prompt A/B tests, or wire up `currai`.
 
 ## 1. What Currai is
 
@@ -288,7 +288,113 @@ export async function chat({ messages, sessionId, userId }: {
 
 Returning the trace id in a response header (`x-currai-trace-id`) lets the client deep-link to the dashboard for debugging.
 
-## 7. Flushing — critical in serverless
+## 7. Managed prompts and A/B tests
+
+The SDK can fetch managed prompts, compile `{{variable}}` placeholders, and create new prompt versions. Fetch prompts at request time when product owners need to edit prompts or run A/B tests without redeploying.
+
+```ts
+const prompt = await currai.getPrompt("support-answer");
+const input = prompt.compile({
+  customerName: user.name,
+  question,
+});
+
+const generation = trace.generation({
+  name: "openai.streamText",
+  model,
+  input,
+  promptName: prompt.name,
+  promptVersion: prompt.version,
+  metadata: {
+    promptLabels: prompt.labels,
+    selectedVariant: prompt.selectedVariant,
+  },
+});
+```
+
+Prompt resolution when `version` and `label` are omitted:
+
+1. active A/B experiment weighted pick
+2. `production` label
+3. latest version
+
+Pin a specific version or label when you need deterministic behavior:
+
+```ts
+await currai.getPrompt("support-answer", { version: 4 });
+await currai.getPrompt("support-answer", { label: "staging" });
+```
+
+`CurraiPrompt` exposes:
+
+- `name`, `version`, `type`, `prompt`, `config`, `labels`, `tags`
+- `variables` — detected `{{variable}}` names in first-seen order
+- `selectedVariant` — `{ label, weight }` when an A/B experiment selected the version, otherwise `null`
+- `compile(vars)` — returns a string for text prompts, or chat messages for chat prompts. Missing variables are left as `{{name}}`.
+
+Create a new prompt version from code with `createPrompt`:
+
+```ts
+await currai.createPrompt({
+  name: "support-answer",
+  type: "chat",
+  prompt: [
+    { role: "system", content: "Answer as {{brandVoice}}." },
+    { role: "user", content: "{{question}}" },
+  ],
+  labels: ["staging"],
+  tags: ["support"],
+  commitMessage: "Tune support answer prompt",
+});
+```
+
+## 8. Python SDK notes
+
+Python uses snake_case constructor options and lifecycle methods, but records the same ingestion events as the TypeScript SDK.
+
+```python
+import os
+from currai import Currai
+
+currai = Currai(
+    public_key=os.environ["CURRAI_PUBLIC_KEY"],
+    secret_key=os.environ["CURRAI_SECRET_KEY"],
+)
+
+trace = currai.trace(name="chat-turn", input={"messages": messages})
+generation = trace.generation(
+    name="openai.chat.completions",
+    model="gpt-4o-mini",
+    input=messages,
+    model_parameters={"temperature": 0.2},
+)
+
+generation.end(output=answer, usage={"total": total_tokens, "unit": "TOKENS"})
+trace.update(output=answer)
+currai.flush()
+```
+
+Prompt APIs are async in Python:
+
+```python
+prompt = await currai.get_prompt("support-answer", label="production")
+compiled = prompt.compile({"question": question})
+
+generation = trace.generation(
+    name="openai.chat.completions",
+    model=model,
+    input=compiled,
+    prompt_name=prompt.name,
+    prompt_version=prompt.version,
+)
+```
+
+Python lifecycle methods:
+
+- `currai.flush()` / `await currai.flush_async()`
+- `currai.shutdown()` / `await currai.shutdown_async()`
+
+## 9. Flushing — critical in serverless
 
 `Currai` batches events on a background timer. In long-lived processes that's fine; in **serverless** or **edge** functions the process can be frozen the instant you return a response, dropping in-flight events.
 
@@ -300,13 +406,15 @@ Always `await currai.flushAsync()`:
 
 If you forget this, the UI will show traces with missing observations — usually the last generation.
 
-## 8. Reference: SDK exports
+## 10. Reference: SDK exports
 
 The `currai` entry point exports:
 
 - `Currai` — the client (`new Currai(options)`)
 - `CurraiTrace`, `CurraiGeneration`, `CurraiSpan`, `CurraiEvent` — observation classes returned by `trace.*()` calls
-- Types: `CurraiOptions`, `TraceCreateBody`, `ObservationBody`, `GenerationBody`, `Usage`, `UsageUnit`, `ObservationLevel`, `IngestionEvent`, `IngestionEventType`, `IngestionResponse`
+- `CurraiPrompt` — resolved managed prompt returned by `getPrompt` / `createPrompt`
+- `extractVariables`, `compileText` — prompt-template helpers
+- Types: `CurraiOptions`, `TraceCreateBody`, `ObservationBody`, `GenerationBody`, `Usage`, `UsageUnit`, `ObservationLevel`, `IngestionEvent`, `IngestionEventType`, `IngestionResponse`, `PromptType`, `ChatMessage`, `PromptResponse`, `GetPromptOptions`, `CreatePromptBody`, `PromptVariables`
 - `authHeader` — internal helper, rarely needed directly
 
 `ObservationLevel` values: `"DEBUG"`, `"DEFAULT"`, `"WARNING"`, `"ERROR"`.
