@@ -10,6 +10,7 @@
   },
   "scripts": {
     "lint": "echo \"(skills) no-op\"",
-    "typecheck": "echo \"(skills) no-op\""
+    "typecheck": "node --check skills/currai/scripts/detect.mjs && node --check skills/currai/scripts/instrument.mjs && node --check skills/currai/scripts/send-demo.mjs",
+    "test": "node --test test/*.test.mjs"
   }
 }

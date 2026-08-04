@@ -1,47 +1,34 @@
-# @currai/skills
+# Currai Skill
 
-Agent Skills for **Currai** — markdown skill packs that teach AI coding agents (Claude Code, Cursor, Windsurf, …) how to use Currai effectively.
-
-A skill is a folder with a `SKILL.md` (YAML frontmatter + body) following the [Claude Code Agent Skills](https://docs.claude.com/) convention. The agent loads the frontmatter into its context and reads the body on demand when the user asks something the skill's `description` matches. Inspired by [`langfuse/skills`](https://github.com/langfuse/skills).
+The Currai agent skill connects TypeScript, JavaScript, and Python AI applications to Currai's user intelligence and agent quality platform through native HTTP. It does not install or require a Currai SDK.
 
 ## Install
 
 ```bash
-npx @currai/skills install
+npx skills add https://github.com/curraiapp/skills --skill currai
 ```
 
-That copies the bundled skill(s) into `./.claude/skills/<name>/`. If you have more than one skill bundled, pass the name:
+Then ask the coding agent:
+
+> Connect this AI application to Currai user intelligence. Instrument the real chat or agent path with native HTTP capture, then verify one real interaction.
+
+## Workflow
+
+The installed skill guides the agent through five steps:
+
+1. Detect the framework, target package, and real AI entrypoint.
+2. Create a dependency-free native HTTP helper and server environment.
+3. Capture sessions plus nested agent, model, tool, retrieval, guardrail, and evaluator evidence.
+4. Restart or deploy the application and trigger a real interaction.
+5. Verify the interaction in Events, User Stories, Intents, Violations, Errors, and traces.
+
+A bundled demo checks endpoint connectivity but never counts as completed application integration.
+
+## Repository development
+
+The package-local installer remains available for repository development:
 
 ```bash
-npx @currai/skills install currai
+node bin/install.mjs install currai --to ./.claude/skills
+node --test test/*.test.mjs
 ```
-
-### Flags
-
-| Flag      | Default              | Description                                       |
-| --------- | -------------------- | ------------------------------------------------- |
-| `--to`    | `./.claude/skills`   | Target directory                                  |
-| `--force` | off                  | Overwrite the destination skill folder if present |
-
-### Examples
-
-```bash
-# Install into a user-wide Claude Code skills directory
-npx @currai/skills install currai --to ~/.claude/skills
-
-# Refresh an existing install
-npx @currai/skills install currai --force
-
-# List available skills
-npx @currai/skills list
-```
-
-## Bundled skills
-
-| Skill    | Description                                                                         |
-| -------- | ----------------------------------------------------------------------------------- |
-| `currai` | Adding observability to an AI app with `currai` — traces, generations, spans, MCP tool wrapping, AI SDK integration, flush hygiene. |
-
-## How is this different from docs?
-
-Documentation explains things to humans. A skill is a compact, machine-targeted brief: a few hundred lines an LLM can hold in context that tells it *which APIs to call, in what shape, in your project*. Same content can fuel both — but the skill is the one that ships into the agent.
