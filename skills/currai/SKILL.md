@@ -8,6 +8,14 @@ description: Connect a TypeScript, JavaScript, or Python AI application to Curra
 Work from the target application root. Use native HTTP capture only; never
 install or create a first-party Currai SDK.
 
+## Customer contract
+
+Keep the customer experience to one action: install this skill and ask the
+coding agent to connect the application with their workspace ID. Run detection,
+instrumentation, helper generation, connectivity checks, and verification
+yourself. Do not ask the customer to run bundled scripts or manually create the
+HTTP helper.
+
 ## Establish the target
 
 Before editing, obtain only missing facts:
@@ -22,7 +30,7 @@ Do not invent a workspace ID or claim integration from a standalone example.
 
 ## Detect the application
 
-Run the bundled detector from this installed skill directory:
+Run the bundled detector yourself from this installed skill directory:
 
 ```bash
 node "$SKILL_DIR/scripts/detect.mjs" --dir <app-path> --json
@@ -34,7 +42,7 @@ path before editing.
 
 ## Configure API-first capture
 
-Create the dependency-free helper and environment configuration:
+Create the dependency-free helper and environment configuration yourself:
 
 ```bash
 node "$SKILL_DIR/scripts/instrument.mjs" \

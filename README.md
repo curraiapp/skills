@@ -12,17 +12,7 @@ Then ask the coding agent:
 
 > Connect this AI application to Currai user intelligence. Instrument the real chat or agent path with native HTTP capture, then verify one real interaction.
 
-## Workflow
-
-The installed skill guides the agent through five steps:
-
-1. Detect the framework, target package, and real AI entrypoint.
-2. Create a dependency-free native HTTP helper and server environment.
-3. Capture sessions plus nested agent, model, tool, retrieval, guardrail, and evaluator evidence.
-4. Restart or deploy the application and trigger a real interaction.
-5. Verify the interaction in Events, User Stories, Intents, Violations, Errors, and traces.
-
-A bundled demo checks endpoint connectivity but never counts as completed application integration.
+That is the complete customer setup. The installed skill handles framework detection, dependency-free native HTTP instrumentation, environment configuration, and real-interaction verification internally.
 
 ## Repository development
 
